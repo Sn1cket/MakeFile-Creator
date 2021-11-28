@@ -41,6 +41,7 @@ def parse_arguments() -> tuple:
     arg_parser.add_argument('-cc', dest='CC', default=defaults['CC'], help='Compiler to be used for C sources.')
     arg_parser.add_argument('-cxx', dest='CXX', default=defaults['CXX'], help='Compiler to be used for C++ sources.')
     arg_parser.add_argument('-ld', dest='LD', default=defaults['LD'], help='Linker command.')
+    arg_parser.add_argument('-asm', dest='ASM', default=defaults['ASM'], help='Assembler to be used.')
     arg_parser.add_argument('-c_flags', dest='C_FLAGS', action=ArgsListUpdater, default=defaults['C_FLAGS'],
                             help='Comma separated list of compiler flags (e.g. -c_flags=flag1,flag2,...).')
     arg_parser.add_argument('-cc_flags', dest='CC_FLAGS', action=ArgsListUpdater, default=defaults['CC_FLAGS'],
@@ -49,6 +50,8 @@ def parse_arguments() -> tuple:
                             help='Comma separated list of compiler flags for C++ sources only (e.g. -cxx_flags=flag1,flag2,...).')
     arg_parser.add_argument('-ld_flags', dest='LD_FLAGS', action=ArgsListParser, default=defaults['LD_FLAGS'],
                             help='Comma separated list on linker flags (e.g. -ld_flags=flag1,flag2,...).')
+    arg_parser.add_argument('-asm_flags', dest='ASM_FLAGS', action=ArgsListUpdater, default=defaults['ASM_FLAGS'],
+                            help='Comma separated list of assembler flags (e.g. -asm_flags=flag1,flag2,...).')
     arg_parser.add_argument('-libs', dest='LIBS', action=ArgsListParser, default=defaults['LIBS'],
                             help='Comma separated list of libraries used to compile the project.')
     arg_parser.add_argument('-include_paths', dest='INCLUDE_PATHS', action=ArgsListParser,

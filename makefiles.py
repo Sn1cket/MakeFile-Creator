@@ -13,11 +13,13 @@ TARGET = str()
 CC = str()
 CXX = str()
 LD = str()
+ASM = str()
 RM = str()
 C_FLAGS = Set()
 CC_FLAGS = Set()
 CXX_FLAGS = Set()
 LD_FLAGS = Set()
+ASM_FLAGS = Set()
 LIBS = Set()
 INCLUDE_PATHS = Set()
 EXTENSIONS = Set()
@@ -40,10 +42,11 @@ def set_include_paths(include_paths: list):
 
         INCLUDE_PATHS.append(abs_path)
         try:
-        C_FLAGS.append(
-                f'-I"{Path(os.path.relpath(abs_path, start=BUILD_DIRECTORY)).as_posix()}"')
+            include = f'-I"{Path(os.path.relpath(abs_path, start=BUILD_DIRECTORY)).as_posix()}"'
         except ValueError:
-            C_FLAGS.append(f'-I"{abs_path.as_posix()}"')
+            include = f'-I"{abs_path.as_posix()}"'
+        C_FLAGS.append(include)
+        ASM_FLAGS.append(include)
 
 
 def set_variables(config: dict) -> None:
@@ -51,11 +54,13 @@ def set_variables(config: dict) -> None:
     global CC
     global CXX
     global LD
+    global ASM
     global RM
     global C_FLAGS
     global CC_FLAGS
     global CXX_FLAGS
     global LD_FLAGS
+    global ASM_FLAGS
     global EXTENSIONS
     global INCLUDE_PATHS
     global IGNORE_PATHS
@@ -74,11 +79,13 @@ def set_variables(config: dict) -> None:
     CC = config['CC']
     CXX = config['CXX']
     LD = config['LD']
+    ASM = config['ASM']
 
     C_FLAGS.extend(config['C_FLAGS'])
     CC_FLAGS.extend(config['CC_FLAGS'])
     CXX_FLAGS.extend(config['CXX_FLAGS'])
     LD_FLAGS.extend(config['LD_FLAGS'])
+    ASM_FLAGS.extend(config['ASM_FLAGS'])
 
     set_libs(config['LIBS'])
     set_include_paths(config['INCLUDE_PATHS'])
@@ -137,7 +144,10 @@ def create_subdir_mk(source_files: list) -> str:
     mk_file_content += 'CC_DEPS += ' + deps_list + '\n\n'
 
     for extension in EXTENSIONS:
-        if extension.lower() == 'cpp' or extension.lower() == 'cc' or extension.lower() == 'cxx':
+        if extension.lower() == 's':
+            compiler = 'ASM'
+            flags = ' '.join(ASM_FLAGS)
+        elif extension.lower() == 'cpp' or extension.lower() == 'cc' or extension.lower() == 'cxx':
             compiler = 'CXX'
             flags = f"{' '.join(C_FLAGS)} {' '.join(CXX_FLAGS)}"
         else:
@@ -366,6 +376,7 @@ def create_makefiles() -> None:
     makefile_content = 'CC := ' + CC + '\n' \
                        f'CXX := {CXX if len(CXX) else "$(CC)"}\n' \
                        'LD := ' + LD + '\n' \
+                       f'ASM := {ASM if len(ASM) else "$(CC)"}\n' \
                        'TARGET := ' + TARGET + '\n' \
                        'OUT := ' + out_bin.as_posix().replace(' ', '\\ ') + '\n' \
                        'LIBS := ' + libs + '\n' \
