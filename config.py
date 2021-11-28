@@ -11,8 +11,11 @@ PACKAGE_NAME = str()
 DEFAULTS = {
     'TARGET': os.path.basename(os.getcwd()),
     'CC': 'gcc',
+    'CXX': '',
     'LD': 'gcc',
     'C_FLAGS': Set(['-c', '-Wall']),
+    'CC_FLAGS': Set(),
+    'CXX_FLAGS': Set(),
     'LD_FLAGS': Set(),
     'LIBS': Set(),
     'INCLUDE_PATHS': Set(),

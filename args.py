@@ -38,10 +38,15 @@ def parse_arguments() -> tuple:
                             help='Ignore configuration file.')
 
     arg_parser.add_argument('-target', dest='TARGET', default=defaults['TARGET'], help='Project target.')
-    arg_parser.add_argument('-cc', dest='CC', default=defaults['CC'], help='Compiler to be used.')
+    arg_parser.add_argument('-cc', dest='CC', default=defaults['CC'], help='Compiler to be used for C sources.')
+    arg_parser.add_argument('-cxx', dest='CXX', default=defaults['CXX'], help='Compiler to be used for C++ sources.')
     arg_parser.add_argument('-ld', dest='LD', default=defaults['LD'], help='Linker command.')
     arg_parser.add_argument('-c_flags', dest='C_FLAGS', action=ArgsListUpdater, default=defaults['C_FLAGS'],
                             help='Comma separated list of compiler flags (e.g. -c_flags=flag1,flag2,...).')
+    arg_parser.add_argument('-cc_flags', dest='CC_FLAGS', action=ArgsListUpdater, default=defaults['CC_FLAGS'],
+                            help='Comma separated list of compiler flags for C sources only (e.g. -cc_flags=flag1,flag2,...).')
+    arg_parser.add_argument('-cxx_flags', dest='CXX_FLAGS', action=ArgsListUpdater, default=defaults['CXX_FLAGS'],
+                            help='Comma separated list of compiler flags for C++ sources only (e.g. -cxx_flags=flag1,flag2,...).')
     arg_parser.add_argument('-ld_flags', dest='LD_FLAGS', action=ArgsListParser, default=defaults['LD_FLAGS'],
                             help='Comma separated list on linker flags (e.g. -ld_flags=flag1,flag2,...).')
     arg_parser.add_argument('-libs', dest='LIBS', action=ArgsListParser, default=defaults['LIBS'],

@@ -11,9 +11,12 @@ import re
 
 TARGET = str()
 CC = str()
+CXX = str()
 LD = str()
 RM = str()
 C_FLAGS = Set()
+CC_FLAGS = Set()
+CXX_FLAGS = Set()
 LD_FLAGS = Set()
 LIBS = Set()
 INCLUDE_PATHS = Set()
@@ -46,9 +49,12 @@ def set_include_paths(include_paths: list):
 def set_variables(config: dict) -> None:
     global TARGET
     global CC
+    global CXX
     global LD
     global RM
     global C_FLAGS
+    global CC_FLAGS
+    global CXX_FLAGS
     global LD_FLAGS
     global EXTENSIONS
     global INCLUDE_PATHS
@@ -66,9 +72,12 @@ def set_variables(config: dict) -> None:
     BIN_DIRECTORY = Path(config['BIN_DIRECTORY']).resolve()
 
     CC = config['CC']
+    CXX = config['CXX']
     LD = config['LD']
 
     C_FLAGS.extend(config['C_FLAGS'])
+    CC_FLAGS.extend(config['CC_FLAGS'])
+    CXX_FLAGS.extend(config['CXX_FLAGS'])
     LD_FLAGS.extend(config['LD_FLAGS'])
 
     set_libs(config['LIBS'])
@@ -127,13 +136,18 @@ def create_subdir_mk(source_files: list) -> str:
     mk_file_content += 'OBJECT_FILES += ' + object_files_list + '\n\n'
     mk_file_content += 'CC_DEPS += ' + deps_list + '\n\n'
 
-    c_flags = ' '.join(C_FLAGS)
-
     for extension in EXTENSIONS:
+        if extension.lower() == 'cpp' or extension.lower() == 'cc' or extension.lower() == 'cxx':
+            compiler = 'CXX'
+            flags = f"{' '.join(C_FLAGS)} {' '.join(CXX_FLAGS)}"
+        else:
+            compiler = 'CC'
+            flags = f"{' '.join(C_FLAGS)} {' '.join(CC_FLAGS)}"
+
         mk_file_content += (build_dir_relative / '%.o').as_posix().replace(' ', '\\ ')
         mk_file_content += ': ' + (src_dir_relative / f'%.{extension}').as_posix().replace(' ', '\\ ') + '\n'
         mk_file_content += '\t@echo \'Building file: $<\'\n'
-        mk_file_content += '\t"$(CC)" ' + c_flags + ' "$<" -o "$@"\n'
+        mk_file_content += f'\t"$({compiler})" ' + flags + ' "$<" -o "$@"\n'
         mk_file_content += '\t@echo \'Build finished: $<\'\n\n'
 
     mk_file_path = BUILD_DIRECTORY / src_relative.parent / 'subdir.mk'
@@ -350,6 +364,7 @@ def create_makefiles() -> None:
     libs = ' '.join(LIBS)
 
     makefile_content = 'CC := ' + CC + '\n' \
+                       f'CXX := {CXX if len(CXX) else "$(CC)"}\n' \
                        'LD := ' + LD + '\n' \
                        'TARGET := ' + TARGET + '\n' \
                        'OUT := ' + out_bin.as_posix().replace(' ', '\\ ') + '\n' \
